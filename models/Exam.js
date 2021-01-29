@@ -8,4 +8,4 @@ const Definition = {
   },
 };
 
-module.exports = schemaModel(Definition, "role");
+module.exports = schemaModel(Definition, "exam");

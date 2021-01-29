@@ -9,6 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3030;
 
 // import the api routes
+const authRoutes = require("./routes/user/auth.routes");
 const roleRoutes = require("./routes/role.routes");
 const firstRoutes = require("./routes/first.routes");
 const staffRoutes = require("./routes/user/staff.routes");
@@ -34,6 +35,7 @@ mongoose
   .catch((err) => console.log(err));
 
 //Connect to routes
+app.use("/api/auth", authRoutes);
 app.use("/api/role", roleRoutes);
 app.use("/api/first", firstRoutes);
 app.use("/api/staff", staffRoutes);

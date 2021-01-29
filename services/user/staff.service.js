@@ -30,11 +30,13 @@ const staffService = {
     Staff.findOne({
       email,
     })
+      .select('-password')
+      .populate("role class busincharge")
       .then((result) => {
         if (result) {
           return res.status(400).json({
             success: false,
-            message: "Email is already been used!",
+            message: 'Email is already been used!',
           });
         }
 
@@ -58,7 +60,7 @@ const staffService = {
             if (err)
               return res.status(500).json({
                 success: false,
-                message: "Error: Unable to create account",
+                message: 'Error: Unable to create account',
                 error: err,
               });
             newStaff.password = hash;
@@ -81,15 +83,15 @@ const staffService = {
                       result: staff,
                       success: true,
                     });
-                  }
+                  },
                 );
               })
               .catch((error) =>
                 res.status(500).json({
                   success: false,
-                  message: "Error: Unable to create account",
+                  message: 'Error: Unable to create account',
                   error,
-                })
+                }),
               );
           });
         });
@@ -97,19 +99,21 @@ const staffService = {
       .catch((error) =>
         res.status(500).json({
           success: false,
-          message: "Error: Unable to create account",
+          message: 'Error: Unable to create account',
           error,
-        })
+        }),
       );
   },
 
   /**
-   * Get one roles from database
+   * Get staffs from database
    * @param req Request to the server
    * @param res Response from the server
    */
   ReadAll: (req, res) => {
     Staff.find({})
+    .select("-password")
+    .populate("role class busincharge")
       .then((result) => {
         return res.status(200).json({ success: true, result });
       })
@@ -117,6 +121,65 @@ const staffService = {
         res
           .status(500)
           .json({ success: false, message: "Unable to fetch Staffs", error })
+      );
+  },
+
+  /**
+   * Get one staff from database
+   * @param req Request to the server
+   * @param res Response from the server
+   */
+  ReadOne: (req, res) => {
+    Staff.findById(req.params.id)
+      .then((result) => {
+        if (!result)
+          return res
+            .status(404)
+            .json({ success: false, message: "Staff not found!" });
+
+        return res.status(200).json({ success: true, result });
+      })
+      .catch((error) =>
+        res
+          .status(500)
+          .json({ success: false, message: "Unable to get Staffs", error })
+      );
+  },
+
+  /**
+   * Update a staff from database
+   * @param req Request to the server
+   * @param res Response from the server
+   */
+  Update: (req, res) => {
+    let newData = req.body;
+    let final = {};
+    for (let key in newData) {
+      if (newData[key] !== "") {
+        final[key] = newData[key];
+      }
+    }
+    Staff.updateOne({ _id: req.params.id }, { $set: final })
+      .then((result) => res.status(200).json({ success: true, result }))
+      .catch((error) =>
+        res
+          .status(500)
+          .json({ success: false, message: "Unable to update Staff", error })
+      );
+  },
+
+  /**
+   * Delete a Staff from database
+   * @param req Request to the server
+   * @param res Response from the server
+   */
+  Delete: (req, res) => {
+    Staff.deleteOne({ _id: req.params.id })
+      .then((result) => res.status(200).json({ success: true, result }))
+      .catch((error) =>
+        res
+          .status(500)
+          .json({ success: false, message: "Unable to delete staff", error })
       );
   },
 };
